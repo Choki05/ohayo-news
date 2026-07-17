@@ -1,0 +1,23 @@
+{
+  "name": "ohayo-news-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["OhayoNewsMCP"]
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MCP_OBJECT",
+        "class_name": "OhayoNewsMCP"
+      }
+    ]
+  },
+  "observability": {
+    "enabled": true
+  }
+}
