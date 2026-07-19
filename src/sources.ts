@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 
-const ITEMS_PER_SOURCE = 8;
+const ITEMS_PER_SOURCE = 4;
 export interface NewsItem {
     title: string;
     url: string;
@@ -86,5 +86,9 @@ export async function getMorningTechNews(): Promise<string> {
         formatSection("Qiita", qiita.status === "fulfilled" ? qiita.value : []),
     ];
 
-    return sections.join("\n");
+    const instructions =
+        "以下は今日取得した技術ニュース記事の一覧です。ユーザーへの返答では、この一覧に含まれる記事を1件も省略せずすべて紹介してください。" +
+        "各記事について、タイトル・元記事へのリンク・2〜3文程度の具体的な日本語要約を必ず付けてください。件数が多くても、まとめたり間引いたりしないでください。\n\n";
+
+    return instructions + sections.join("\n");
 }
