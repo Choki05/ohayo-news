@@ -1,6 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 
-const ITEMS_PER_SOURCE = 4;
+const ITEMS_PER_SOURCE = 3;
+const QIITA_CANDIDATE_POOL_SIZE = 30;
 export interface NewsItem {
     title: string;
     url: string;
@@ -59,11 +60,12 @@ async function fetchQiita(): Promise<NewsItem[]> {
     const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const query = encodeURIComponent(`stocks:>3 created:>=${since}`);
     const res = await fetch(
-        `https://qiita.com/api/v2/items?page=1&per_page=${ITEMS_PER_SOURCE}&query=${query}`
+        `https://qiita.com/api/v2/items?page=1&per_page=${QIITA_CANDIDATE_POOL_SIZE}&query=${query}`
     );
     const data = (await res.json()) as any[];
     return data
         .sort((a, b) => b.likes_count - a.likes_count)
+        .slice(0, ITEMS_PER_SOURCE)
         .map((item) => ({
             title: item.title,
             url: item.url,
@@ -88,7 +90,7 @@ export async function getMorningTechNews(): Promise<string> {
 
     const instructions =
         "以下は今日取得した技術ニュース記事の一覧です。ユーザーへの返答では、この一覧に含まれる記事を1件も省略せずすべて紹介してください。" +
-        "各記事について、タイトル・元記事へのリンク・2〜3文程度の具体的な日本語要約を必ず付けてください。件数が多くても、まとめたり間引いたりしないでください。\n\n";
+        "各記事について、タイトル・元記事へのリンクに加えて、4〜5文程度の詳しい日本語解説を付けてください。何が新しいのか・なぜ話題なのか・どういう人に役立ちそうかが伝わるように、具体的に説明してください。件数は少ないので、簡潔にまとめすぎず、内容を掘り下げてください。\n\n";
 
     return instructions + sections.join("\n");
 }
