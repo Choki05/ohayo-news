@@ -57,7 +57,7 @@ async function fetchZenn(): Promise<NewsItem[]>{
 }
 
 async function fetchQiita(): Promise<NewsItem[]> {
-    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const since = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const query = encodeURIComponent(`stocks:>3 created:>=${since}`);
     const res = await fetch(
         `https://qiita.com/api/v2/items?page=1&per_page=${QIITA_CANDIDATE_POOL_SIZE}&query=${query}`
