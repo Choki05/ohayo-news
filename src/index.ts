@@ -16,7 +16,7 @@ export class OhayoNewsMCP extends McpAgent {
   async init() {
     this.server.tool(
       "get_morning_tech_news",
-      "GitHub Trending, Hacker News, Zenn, Qiitaから今日の技術系トレンド記事をまとめて取得する。朝の挨拶をされたときに呼び出す。",
+      "GitHub Trending, Hacker News, Zenn, Qiitaから今日の技術系トレンド記事をまとめて取得する。朝の挨拶をされたときに呼び出す。取得した記事は、各1〜2行で日本語要約して箇条書きで提示すること。",
       {},
       async () => {
         const text = await getMorningTechNews();
