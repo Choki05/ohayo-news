@@ -43,19 +43,6 @@ async function fetchHackerNews(): Promise<NewsItem[]>{
     }));
 }
 
-async function fetchReddit(): Promise<NewsItem[]>{
-    const res = await fetch(
-        `https://www.reddit.com/r/programming/top.json?limit=${ITEMS_PER_SOURCE}&t=day`,
-        { headers: {"User-Agent": "ohayo-news-mcp/1.0"} }
-    );
-    const data = (await res.json()) as {data: {children: any[] }  };
-    return data.data.children.map((child) => ({
-        title: child.data.title,
-        url: `https://www.reddit.com${child.data.permalink}`,
-        meta: `${child.data.ups}pt`,
-    }));
-}
-
 async function fetchZenn(): Promise<NewsItem[]>{
     const res = await fetch(
         `https://zenn.dev/api/articles?order=daily`
@@ -69,16 +56,35 @@ async function fetchZenn(): Promise<NewsItem[]>{
 }
 
 async function fetchQiita(): Promise<NewsItem[]> {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const query = encodeURIComponent(`stocks:>3 created:>=${since}`);
     const res = await fetch(
-        `https://qiita.com/api/v2/items?page=1&per_page=20`
+        `https://qiita.com/api/v2/items?page=1&per_page=${ITEMS_PER_SOURCE}&query=${query}`
     );
     const data = (await res.json()) as any[];
     return data
-        .sort((a,b) => b.likes_count - a.likes_count)
-        .slice(0, ITEMS_PER_SOURCE)
+        .sort((a, b) => b.likes_count - a.likes_count)
         .map((item) => ({
             title: item.title,
             url: item.url,
             meta: `${item.likes_count}likes`,
         }));
+}
+
+export async function getMorningTechNews(): Promise<string> {
+    const [github, hn, zenn, qiita] = await Promise.allSettled([
+        fetchGitHubTrending(),
+        fetchHackerNews(),
+        fetchZenn(),
+        fetchQiita(),
+    ]);
+
+    const sections = [
+        formatSection("GitHub Trending", github.status === "fulfilled" ? github.value: []),
+        formatSection("Hacker News", hn.status === "fulfilled" ? hn.value : []),
+        formatSection("Zenn", zenn.status === "fulfilled" ? zenn.value : []),
+        formatSection("Qiita", qiita.status === "fulfilled" ? qiita.value : []),
+    ];
+
+    return sections.join("\n");
 }

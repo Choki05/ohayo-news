@@ -1,5 +1,6 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { getMorningTechNews } from "./sources";
 
 interface Env {
   AUTH_TOKEN: string;
@@ -13,7 +14,17 @@ export class OhayoNewsMCP extends McpAgent {
   });
 
   async init() {
-    // ここに次のステップでツールを登録する
+    this.server.tool(
+      "get_morning_tech_news",
+      "GitHub Trending, Hacker News, Zenn, Qiitaから今日の技術系トレンド記事をまとめて取得する。朝の挨拶をされたときに呼び出す。",
+      {},
+      async () => {
+        const text = await getMorningTechNews();
+        return {
+          content: [{ type: "text", text}],
+        };
+      }
+    );
   }
 }
 
